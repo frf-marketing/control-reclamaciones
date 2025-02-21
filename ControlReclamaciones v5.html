@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Reclamaciones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-6">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-center">Control de Reclamaciones</h1>
+        
+        <!-- Panel de Técnicos -->
+        <div id="technicians-container" class="grid grid-cols-2 gap-4 mb-6"></div>
+
+        <!-- Formulario para añadir reclamaciones -->
+        <div class="bg-gray-800 p-4 rounded-lg mb-6">
+            <h2 class="text-xl font-bold mb-2">Añadir Reclamación</h2>
+            <select id="technician" class="bg-gray-700 text-white p-2 rounded w-full mb-2"></select>
+            <input type="text" id="service-number" placeholder="Número de Servicio" class="bg-gray-700 text-white p-2 rounded w-full mb-2">
+            <select id="month" class="bg-gray-700 text-white p-2 rounded w-full mb-2">
+                <option value="Enero">Enero</option>
+                <option value="Febrero">Febrero</option>
+                <option value="Marzo">Marzo</option>
+                <option value="Abril">Abril</option>
+                <option value="Mayo">Mayo</option>
+                <option value="Junio">Junio</option>
+                <option value="Julio">Julio</option>
+                <option value="Agosto">Agosto</option>
+                <option value="Septiembre">Septiembre</option>
+                <option value="Octubre">Octubre</option>
+                <option value="Noviembre">Noviembre</option>
+                <option value="Diciembre">Diciembre</option>
+            </select>
+            <button id="add-complaint" class="bg-blue-600 p-2 rounded w-full mt-2">Añadir Reclamación</button>
+        </div>
+
+        <!-- Promedios Históricos -->
+        <div class="bg-gray-800 p-4 rounded-lg">
+            <h2 class="text-xl font-bold mb-2">Promedios Históricos</h2>
+            <p id="average-aires">Aires: 0%</p>
+            <p id="average-calderas">Calderas: 0%</p>
+            <p id="average-general">General: 0%</p>
+        </div>
+    </div>
+    
+    <script>
+        const technicians = [
+            { name: "Jonny S.", type: "Aires" },
+            { name: "Juan R.", type: "Aires" },
+            { name: "JuanD M.", type: "Aires" },
+            { name: "Albert", type: "Calderas" },
+            { name: "Javier", type: "Calderas" }
+        ];
+
+        function loadTechnicians() {
+            const container = document.getElementById('technicians-container');
+            const select = document.getElementById('technician');
+            container.innerHTML = '';
+            select.innerHTML = '';
+
+            technicians.forEach(tech => {
+                const div = document.createElement('div');
+                div.className = "bg-gray-700 p-4 rounded-lg text-center";
+                div.innerHTML = `
+                    <p class='font-bold'>${tech.name}</p>
+                    <p id='${tech.name}-percent'>0% recl.</p>
+                    <button class='bg-blue-600 p-2 rounded mt-2' onclick="openTechnicianPage('${tech.name}')">Ver más</button>
+                `;
+                container.appendChild(div);
+                
+                const option = document.createElement('option');
+                option.value = tech.name;
+                option.textContent = tech.name;
+                select.appendChild(option);
+            });
+        }
+
+        function openTechnicianPage(name) {
+            localStorage.setItem('currentTechnician', name);
+            document.location.href = 'technician.html';
+        }
+
+        function addComplaint() {
+            const technician = document.getElementById('technician').value;
+            const serviceNumber = document.getElementById('service-number').value;
+            const month = document.getElementById('month').value;
+
+            if (!technician || !serviceNumber || !month) {
+                alert('Por favor, complete todos los campos.');
+                return;
+            }
+
+            const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+            complaints.push({ technician, serviceNumber, month });
+            localStorage.setItem('complaints', JSON.stringify(complaints));
+            alert('Reclamación añadida correctamente.');
+        }
+
+        document.getElementById('add-complaint').addEventListener('click', addComplaint);
+        loadTechnicians();
+    </script>
+</body>
+</html>
