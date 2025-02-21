@@ -66,22 +66,24 @@
             loadComplaints();
         }
 
-        function deleteComplaint(index) {
+       function deleteComplaint(index) {
     let complaints = JSON.parse(localStorage.getItem('complaints')) || [];
     const technicianName = localStorage.getItem('currentTechnician');
     const currentMonth = localStorage.getItem('currentMonth');
 
     // Filtrar solo las reclamaciones del técnico y mes actual
-    const filteredComplaints = complaints.filter(c => c.technician === technicianName && c.month === currentMonth);
+    let filteredComplaints = complaints.filter(c => c.technician === technicianName && c.month === currentMonth);
 
-    // Verificar que el índice sea válido
+    // Verificar que el índice sea válido antes de eliminar
     if (index >= 0 && index < filteredComplaints.length) {
-        // Eliminar solo la reclamación seleccionada
         filteredComplaints.splice(index, 1);
     }
 
-    // Crear una nueva lista de reclamaciones con los cambios aplicados
-    const updatedComplaints = complaints.filter(c => !(c.technician === technicianName && c.month === currentMonth)).concat(filteredComplaints);
+    // Mantener todas las demás reclamaciones intactas
+    let remainingComplaints = complaints.filter(c => !(c.technician === technicianName && c.month === currentMonth));
+
+    // Combinar las listas sin afectar otros meses ni técnicos
+    let updatedComplaints = [...remainingComplaints, ...filteredComplaints];
 
     // Guardar la nueva lista en localStorage
     localStorage.setItem('complaints', JSON.stringify(updatedComplaints));
