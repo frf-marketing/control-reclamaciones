@@ -54,126 +54,64 @@
         ];
 
         function loadTechnicians() {
-    const container = document.getElementById('technicians-container');
-    const select = document.getElementById('technician');
-    container.innerHTML = '';
-    select.innerHTML = '';
-
-    const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
-    const servicesData = JSON.parse(localStorage.getItem('servicesData')) || {};
-
-    technicians.forEach(tech => {
-        const technicianName = tech.name;
-
-        // Obtener todas las reclamaciones del técnico
-        const technicianComplaints = complaints.filter(c => c.technician === technicianName);
-        const totalComplaints = technicianComplaints.length;
-
-        // Obtener el total de servicios del técnico sumando todos los meses
-        let totalServices = 0;
-        if (servicesData[technicianName]) {
-            totalServices = Object.values(servicesData[technicianName]).reduce((sum, num) => sum + num, 0);
-        }
-
-        // Calcular el porcentaje promedio de reclamaciones
-        const percentage = totalServices > 0 ? Math.round((totalComplaints / totalServices) * 100) : 0;
-
-        // Crear el cuadro del técnico en la interfaz
-        const div = document.createElement('div');
-        div.className = "bg-gray-700 p-4 rounded-lg text-center";
-        div.innerHTML = `
-            <p class='font-bold'>${technicianName}</p>
-            <p id='${technicianName}-percent'>${percentage}% recl.</p>
-            <button class='bg-blue-600 p-2 rounded mt-2' onclick="openTechnicianPage('${technicianName}')">Ver más</button>
-        `;
-        container.appendChild(div);
-
-        // Añadir opción en el dropdown de selección de técnicos
-        const option = document.createElement('option');
-        option.value = technicianName;
-        option.textContent = technicianName;
-        select.appendChild(option);
-    });
-}
-
-        function calculateHistoricalAverages() {
-    const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
-    const servicesData = JSON.parse(localStorage.getItem('servicesData')) || {};
-
-    let totalComplaintsAires = 0, totalServicesAires = 0;
-    let totalComplaintsCalderas = 0, totalServicesCalderas = 0;
-    let totalComplaintsGeneral = 0, totalServicesGeneral = 0;
-
-    technicians.forEach(tech => {
-        const technicianName = tech.name;
-        const isAires = tech.type === "Aires";
-        const isCalderas = tech.type === "Calderas";
-
-        // Contar todas las reclamaciones del técnico
-        const technicianComplaints = complaints.filter(c => c.technician === technicianName).length;
-
-        // Sumar todos los servicios del técnico
-        let technicianServices = 0;
-        if (servicesData[technicianName]) {
-            technicianServices = Object.values(servicesData[technicianName]).reduce((sum, num) => sum + num, 0);
-        }
-
-        // Sumar datos a los promedios según el tipo de técnico
-        if (isAires) {
-            totalComplaintsAires += technicianComplaints;
-            totalServicesAires += technicianServices;
-        }
-        if (isCalderas) {
-            totalComplaintsCalderas += technicianComplaints;
-            totalServicesCalderas += technicianServices;
-        }
-        totalComplaintsGeneral += technicianComplaints;
-        totalServicesGeneral += technicianServices;
-    });
-
-    // Calcular promedios finales
-    const averageAires = totalServicesAires > 0 ? Math.round((totalComplaintsAires / totalServicesAires) * 100) : 0;
-    const averageCalderas = totalServicesCalderas > 0 ? Math.round((totalComplaintsCalderas / totalServicesCalderas) * 100) : 0;
-    const averageGeneral = totalServicesGeneral > 0 ? Math.round((totalComplaintsGeneral / totalServicesGeneral) * 100) : 0;
-
-    // Actualizar la interfaz con los valores calculados
-    document.getElementById("average-aires").textContent = `Aires: ${averageAires}%`;
-    document.getElementById("average-calderas").textContent = `Calderas: ${averageCalderas}%`;
-    document.getElementById("average-general").textContent = `General: ${averageGeneral}%`;
-}
-
-// Asegurar que se calculen los promedios al cargar la página
-document.addEventListener("DOMContentLoaded", calculateHistoricalAverages);
-
-        
-// Asegurar que la función se ejecute al cargar la página
-document.addEventListener("DOMContentLoaded", loadTechnicians);
-
-
-
-        function openTechnicianPage(name) {
-            localStorage.setItem('currentTechnician', name);
-            document.location.href = 'technician.html';
-        }
-
-        function addComplaint() {
-            const technician = document.getElementById('technician').value;
-            const serviceNumber = document.getElementById('service-number').value;
-            const month = document.getElementById('month').value;
-
-            if (!technician || !serviceNumber || !month) {
-                alert('Por favor, complete todos los campos.');
-                return;
-            }
+            const container = document.getElementById('technicians-container');
+            const select = document.getElementById('technician');
+            container.innerHTML = '';
+            select.innerHTML = '';
 
             const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
-            complaints.push({ technician, serviceNumber, month });
-            localStorage.setItem('complaints', JSON.stringify(complaints));
-            alert('Reclamación añadida correctamente.');
+            const servicesData = JSON.parse(localStorage.getItem('servicesData')) || {};
+
+            technicians.forEach(tech => {
+                const technicianName = tech.name;
+                const technicianComplaints = complaints.filter(c => c.technician === technicianName).length;
+                let totalServices = 0;
+                if (servicesData[technicianName]) {
+                    totalServices = Object.values(servicesData[technicianName]).reduce((sum, num) => sum + num, 0);
+                }
+                const percentage = totalServices > 0 ? Math.round((technicianComplaints / totalServices) * 100) : 0;
+
+                const div = document.createElement('div');
+                div.className = "bg-gray-700 p-4 rounded-lg text-center";
+                div.innerHTML = `
+                    <p class='font-bold'>${technicianName}</p>
+                    <p>${percentage}% recl.</p>
+                    <button class='bg-blue-600 p-2 rounded mt-2' onclick="openTechnicianPage('${technicianName}')">Ver más</button>
+                `;
+                container.appendChild(div);
+            });
         }
 
-        document.getElementById('add-complaint').addEventListener('click', addComplaint);
-        loadTechnicians();
+        function calculateHistoricalAverages() {
+            const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+            const servicesData = JSON.parse(localStorage.getItem('servicesData')) || {};
+            let totalComplaintsAires = 0, totalServicesAires = 0;
+            let totalComplaintsCalderas = 0, totalServicesCalderas = 0;
+            let totalComplaintsGeneral = 0, totalServicesGeneral = 0;
+
+            technicians.forEach(tech => {
+                const complaintsCount = complaints.filter(c => c.technician === tech.name).length;
+                const servicesCount = servicesData[tech.name] ? Object.values(servicesData[tech.name]).reduce((sum, num) => sum + num, 0) : 0;
+                if (tech.type === "Aires") {
+                    totalComplaintsAires += complaintsCount;
+                    totalServicesAires += servicesCount;
+                } else {
+                    totalComplaintsCalderas += complaintsCount;
+                    totalServicesCalderas += servicesCount;
+                }
+                totalComplaintsGeneral += complaintsCount;
+                totalServicesGeneral += servicesCount;
+            });
+
+            document.getElementById("average-aires").textContent = `Aires: ${totalServicesAires > 0 ? Math.round((totalComplaintsAires / totalServicesAires) * 100) : 0}%`;
+            document.getElementById("average-calderas").textContent = `Calderas: ${totalServicesCalderas > 0 ? Math.round((totalComplaintsCalderas / totalServicesCalderas) * 100) : 0}%`;
+            document.getElementById("average-general").textContent = `General: ${totalServicesGeneral > 0 ? Math.round((totalComplaintsGeneral / totalServicesGeneral) * 100) : 0}%`;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadTechnicians();
+            calculateHistoricalAverages();
+        });
     </script>
 </body>
 </html>
