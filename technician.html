@@ -55,7 +55,7 @@
                 servicesData[technicianName][month] = Number(total);
                 localStorage.setItem('servicesData', JSON.stringify(servicesData));
                 alert('Total de servicios guardado');
-                
+
                 // 🔹 Actualizar la interfaz inmediatamente
                 loadMonths();
             }
@@ -66,7 +66,7 @@
             window.location.href = 'complaints.html';
         }
 
-        loadMonths();
+        window.onload = loadMonths;
     </script>
 </body>
 </html>
