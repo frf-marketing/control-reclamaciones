@@ -125,6 +125,32 @@
             loadTechnicians();
             calculateHistoricalAverages();
         });
+       function addComplaint() {
+    const technician = document.getElementById('technician').value;
+    const serviceNumber = document.getElementById('service-number').value;
+    const month = document.getElementById('month').value;
+
+    if (!technician || !serviceNumber || !month) {
+        alert('Por favor, complete todos los campos.');
+        return;
+    }
+
+    // Obtener las reclamaciones almacenadas o inicializar un array vacío
+    const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+
+    // Añadir la nueva reclamación
+    complaints.push({ technician, serviceNumber, month });
+
+    // Guardar en localStorage
+    localStorage.setItem('complaints', JSON.stringify(complaints));
+
+    // Confirmación visual
+    alert('Reclamación añadida correctamente.');
+
+    // Limpiar los campos después de añadir
+    document.getElementById('service-number').value = "";
+}
+ 
     </script>
 </body>
 </html>
