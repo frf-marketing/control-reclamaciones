@@ -82,6 +82,11 @@
             });
         }
 
+        function openTechnicianPage(name) {
+    localStorage.setItem('currentTechnician', name);
+    window.location.href = 'technician.html';
+}
+
         function calculateHistoricalAverages() {
             const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
             const servicesData = JSON.parse(localStorage.getItem('servicesData')) || {};
