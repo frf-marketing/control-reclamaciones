@@ -65,17 +65,20 @@
     technicians.forEach(tech => {
         const technicianName = tech.name;
 
-        // Calcular total de reclamaciones y total de servicios
-        let totalComplaints = complaints.filter(c => c.technician === technicianName).length;
+        // Obtener todas las reclamaciones del técnico
+        const technicianComplaints = complaints.filter(c => c.technician === technicianName);
+        const totalComplaints = technicianComplaints.length;
+
+        // Obtener el total de servicios del técnico sumando todos los meses
         let totalServices = 0;
         if (servicesData[technicianName]) {
             totalServices = Object.values(servicesData[technicianName]).reduce((sum, num) => sum + num, 0);
         }
 
-        // Calcular el porcentaje promedio histórico
+        // Calcular el porcentaje promedio de reclamaciones
         const percentage = totalServices > 0 ? Math.round((totalComplaints / totalServices) * 100) : 0;
 
-        // Crear el cuadro del técnico
+        // Crear el cuadro del técnico en la interfaz
         const div = document.createElement('div');
         div.className = "bg-gray-700 p-4 rounded-lg text-center";
         div.innerHTML = `
@@ -92,6 +95,10 @@
         select.appendChild(option);
     });
 }
+
+// Asegurar que la función se ejecute al cargar la página
+document.addEventListener("DOMContentLoaded", loadTechnicians);
+
 
 
         function openTechnicianPage(name) {
