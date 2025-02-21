@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reclamaciones del Mes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-6">
+    <div class="max-w-4xl mx-auto">
+        <button onclick="goBack()" class="bg-gray-700 p-2 rounded">⬅ Atrás</button>
+        <h1 id="page-title" class="text-3xl font-bold mb-6 text-center"></h1>
+        
+        <div id="complaints-container" class="bg-gray-800 p-4 rounded-lg mb-6"></div>
+        
+        <!-- Formulario para añadir reclamaciones -->
+        <div class="bg-gray-800 p-4 rounded-lg">
+            <h2 class="text-xl font-bold mb-2">Añadir Reclamación</h2>
+            <input type="text" id="service-number" placeholder="Número de Servicio" class="bg-gray-700 text-white p-2 rounded w-full mb-2">
+            <button onclick="addComplaint()" class="bg-blue-600 p-2 rounded w-full mt-2">Añadir Reclamación</button>
+        </div>
+    </div>
+    
+    <script>
+        const technicianName = localStorage.getItem('currentTechnician');
+        const currentMonth = localStorage.getItem('currentMonth');
+        document.getElementById('page-title').textContent = `Reclamaciones de ${currentMonth} - ${technicianName}`;
+
+        function goBack() {
+            window.location.href = 'technician.html';
+        }
+
+        function loadComplaints() {
+            const container = document.getElementById('complaints-container');
+            container.innerHTML = '';
+            const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+            const filteredComplaints = complaints.filter(c => c.technician === technicianName && c.month === currentMonth);
+
+            if (filteredComplaints.length === 0) {
+                container.innerHTML = '<p class="text-center">No hay reclamaciones registradas.</p>';
+                return;
+            }
+
+            filteredComplaints.forEach((complaint, index) => {
+                const div = document.createElement('div');
+                div.className = "bg-gray-700 p-4 rounded-lg flex justify-between items-center mb-2";
+                div.innerHTML = `
+                    <p class='font-bold'>Servicio: ${complaint.serviceNumber}</p>
+                    <button onclick="deleteComplaint(${index})" class='bg-red-600 p-2 rounded'>Eliminar</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addComplaint() {
+            const serviceNumber = document.getElementById('service-number').value;
+            if (!serviceNumber) {
+                alert('Ingrese un número de servicio.');
+                return;
+            }
+            
+            const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+            complaints.push({ technician: technicianName, serviceNumber, month: currentMonth });
+            localStorage.setItem('complaints', JSON.stringify(complaints));
+            alert('Reclamación añadida correctamente.');
+            loadComplaints();
+        }
+
+        function deleteComplaint(index) {
+            const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+            const filteredComplaints = complaints.filter(c => !(c.technician === technicianName && c.month === currentMonth));
+            filteredComplaints.splice(index, 1);
+            localStorage.setItem('complaints', JSON.stringify([...filteredComplaints, ...complaints.filter(c => c.technician !== technicianName || c.month !== currentMonth)]));
+            alert('Reclamación eliminada.');
+            loadComplaints();
+        }
+
+        loadComplaints();
+    </script>
+</body>
+</html>
