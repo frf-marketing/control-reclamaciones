@@ -23,22 +23,29 @@
             window.location.href = 'index.html';
         }
 
-        function loadMonths() {
-            const container = document.getElementById('months-container');
-            container.innerHTML = '';
+       function loadMonths() {
+    const container = document.getElementById('months-container');
+    container.innerHTML = '';
 
-            months.forEach(month => {
-                const div = document.createElement('div');
-                div.className = "bg-gray-700 p-4 rounded-lg text-center";
-                div.innerHTML = `
-                    <p class='font-bold'>${month}</p>
-                    <p id='${month}-percent'>0% recl.</p>
-                    <button class='bg-blue-600 p-2 rounded mt-2' onclick="setTotalServices('${month}')">Añadir Total Servicios</button>
-                    <button class='bg-green-600 p-2 rounded mt-2' onclick="viewComplaints('${month}')">Ver Reclamaciones</button>
-                `;
-                container.appendChild(div);
-            });
-        }
+    const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+    const servicesData = JSON.parse(localStorage.getItem('servicesData')) || {};
+    
+    months.forEach(month => {
+        const totalServices = servicesData[technicianName]?.[month] || 0;
+        const complaintCount = complaints.filter(c => c.technician === technicianName && c.month === month).length;
+        const percentage = totalServices > 0 ? Math.round((complaintCount / totalServices) * 100) : 0;
+
+        const div = document.createElement('div');
+        div.className = "bg-gray-700 p-4 rounded-lg text-center";
+        div.innerHTML = `
+            <p class='font-bold'>${month}</p>
+            <p id='${month}-percent'>${percentage}% recl. (${complaintCount} / ${totalServices})</p>
+            <button class='bg-blue-600 p-2 rounded mt-2' onclick="setTotalServices('${month}')">Añadir Total Servicios</button>
+            <button class='bg-green-600 p-2 rounded mt-2' onclick="viewComplaints('${month}')">Ver Reclamaciones</button>
+        `;
+        container.appendChild(div);
+    });
+}
 
         function setTotalServices(month) {
             const total = prompt(`Ingrese el total de servicios para ${month}`);
