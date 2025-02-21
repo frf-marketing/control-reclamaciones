@@ -96,6 +96,56 @@
     });
 }
 
+        function calculateHistoricalAverages() {
+    const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+    const servicesData = JSON.parse(localStorage.getItem('servicesData')) || {};
+
+    let totalComplaintsAires = 0, totalServicesAires = 0;
+    let totalComplaintsCalderas = 0, totalServicesCalderas = 0;
+    let totalComplaintsGeneral = 0, totalServicesGeneral = 0;
+
+    technicians.forEach(tech => {
+        const technicianName = tech.name;
+        const isAires = tech.type === "Aires";
+        const isCalderas = tech.type === "Calderas";
+
+        // Contar todas las reclamaciones del técnico
+        const technicianComplaints = complaints.filter(c => c.technician === technicianName).length;
+
+        // Sumar todos los servicios del técnico
+        let technicianServices = 0;
+        if (servicesData[technicianName]) {
+            technicianServices = Object.values(servicesData[technicianName]).reduce((sum, num) => sum + num, 0);
+        }
+
+        // Sumar datos a los promedios según el tipo de técnico
+        if (isAires) {
+            totalComplaintsAires += technicianComplaints;
+            totalServicesAires += technicianServices;
+        }
+        if (isCalderas) {
+            totalComplaintsCalderas += technicianComplaints;
+            totalServicesCalderas += technicianServices;
+        }
+        totalComplaintsGeneral += technicianComplaints;
+        totalServicesGeneral += technicianServices;
+    });
+
+    // Calcular promedios finales
+    const averageAires = totalServicesAires > 0 ? Math.round((totalComplaintsAires / totalServicesAires) * 100) : 0;
+    const averageCalderas = totalServicesCalderas > 0 ? Math.round((totalComplaintsCalderas / totalServicesCalderas) * 100) : 0;
+    const averageGeneral = totalServicesGeneral > 0 ? Math.round((totalComplaintsGeneral / totalServicesGeneral) * 100) : 0;
+
+    // Actualizar la interfaz con los valores calculados
+    document.getElementById("average-aires").textContent = `Aires: ${averageAires}%`;
+    document.getElementById("average-calderas").textContent = `Calderas: ${averageCalderas}%`;
+    document.getElementById("average-general").textContent = `General: ${averageGeneral}%`;
+}
+
+// Asegurar que se calculen los promedios al cargar la página
+document.addEventListener("DOMContentLoaded", calculateHistoricalAverages);
+
+        
 // Asegurar que la función se ejecute al cargar la página
 document.addEventListener("DOMContentLoaded", loadTechnicians);
 
