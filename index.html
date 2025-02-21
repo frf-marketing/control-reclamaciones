@@ -54,27 +54,45 @@
         ];
 
         function loadTechnicians() {
-            const container = document.getElementById('technicians-container');
-            const select = document.getElementById('technician');
-            container.innerHTML = '';
-            select.innerHTML = '';
+    const container = document.getElementById('technicians-container');
+    const select = document.getElementById('technician');
+    container.innerHTML = '';
+    select.innerHTML = '';
 
-            technicians.forEach(tech => {
-                const div = document.createElement('div');
-                div.className = "bg-gray-700 p-4 rounded-lg text-center";
-                div.innerHTML = `
-                    <p class='font-bold'>${tech.name}</p>
-                    <p id='${tech.name}-percent'>0% recl.</p>
-                    <button class='bg-blue-600 p-2 rounded mt-2' onclick="openTechnicianPage('${tech.name}')">Ver más</button>
-                `;
-                container.appendChild(div);
-                
-                const option = document.createElement('option');
-                option.value = tech.name;
-                option.textContent = tech.name;
-                select.appendChild(option);
-            });
+    const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+    const servicesData = JSON.parse(localStorage.getItem('servicesData')) || {};
+
+    technicians.forEach(tech => {
+        const technicianName = tech.name;
+
+        // Calcular total de reclamaciones y total de servicios
+        let totalComplaints = complaints.filter(c => c.technician === technicianName).length;
+        let totalServices = 0;
+        if (servicesData[technicianName]) {
+            totalServices = Object.values(servicesData[technicianName]).reduce((sum, num) => sum + num, 0);
         }
+
+        // Calcular el porcentaje promedio histórico
+        const percentage = totalServices > 0 ? Math.round((totalComplaints / totalServices) * 100) : 0;
+
+        // Crear el cuadro del técnico
+        const div = document.createElement('div');
+        div.className = "bg-gray-700 p-4 rounded-lg text-center";
+        div.innerHTML = `
+            <p class='font-bold'>${technicianName}</p>
+            <p id='${technicianName}-percent'>${percentage}% recl.</p>
+            <button class='bg-blue-600 p-2 rounded mt-2' onclick="openTechnicianPage('${technicianName}')">Ver más</button>
+        `;
+        container.appendChild(div);
+
+        // Añadir opción en el dropdown de selección de técnicos
+        const option = document.createElement('option');
+        option.value = technicianName;
+        option.textContent = technicianName;
+        select.appendChild(option);
+    });
+}
+
 
         function openTechnicianPage(name) {
             localStorage.setItem('currentTechnician', name);
